@@ -1,0 +1,43 @@
+# Text editors and IDEs
+.swp # Vim
+.idea
+.editorconfig
+
+# JavaScript trash
+node_modules
+dist/
+tsconfig.tsbuildinfo
+yarn-error.log
+
+# macOS matters
+.DS_Store
+
+# See https://github.com/motdotla/dotenv#should-i-commit-my-env-file
+.env*
+!.env.example
+
+# Local scripts written/used for clients (generate csv etc.)
+/local-scripts
+
+# I have these with aspell but I guess a ton
+# of other tools can also generate these
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.yarn/unplugged
+.yarn/build-state.yml
+
+target/
+
+junit.xml
+
+# test coverage
+front/coverage
+logs/
+pg_delivery/
+/target
+.env
