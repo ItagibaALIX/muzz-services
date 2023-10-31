@@ -9,7 +9,7 @@ pub struct Config {
     pub smtp_user: String,
     pub smtp_pass: String,
     pub smtp_from: String,
-    pub frontend_origin: String,
+    pub backend_origin: String,
 }
 
 impl Config {
@@ -25,8 +25,8 @@ impl Config {
         let smtp_pass = std::env::var("SMTP_PASS").expect("SMTP_PASS must be set");
         let smtp_from = std::env::var("SMTP_FROM").expect("SMTP_FROM must be set");
 
-        let frontend_origin =
-            std::env::var("FRONTEND_ORIGIN").expect("FRONTEND_ORIGIN must be set");
+        let backend_origin =
+            std::env::var("BACKEND_ORIGIN").expect("BACKEND_ORIGIN must be set");
 
         Config {
             database_url,
@@ -38,7 +38,7 @@ impl Config {
             smtp_user,
             smtp_port: smtp_port.parse::<u16>().unwrap(),
             smtp_from,
-            frontend_origin,
+            backend_origin,
         }
     }
 }

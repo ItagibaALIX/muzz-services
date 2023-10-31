@@ -77,10 +77,12 @@ pub async fn register_user_handler(
     let email = body.email.to_owned().to_ascii_lowercase();
     let id = uuid::Uuid::new_v4().to_string();
     let verification_url = format!(
-        "{}/verifyemail/{}",
-        data.config.frontend_origin.to_owned(),
+        "{}/api/auth/verifyemail/{}",
+        data.config.backend_origin.to_owned(),
         verification_code
     );
+
+    println!("verification_url {verification_url}");
 
     let user: User = sqlx::query_as(
         "INSERT INTO users (id,name,email,password) VALUES ($1, $2, $3, $4) RETURNING *",
@@ -103,27 +105,27 @@ pub async fn register_user_handler(
     })?;
 
     //  Create an Email instance
-    let email_instance = Email::new(user, verification_url, data.config.clone());
-    if let Err(_) = email_instance.send_verification_code().await {
-        let json_error = ErrorResponse {
-            status: "fail",
-            message: "Something bad happended while sending the verification code".to_string(),
-        };
-        return Err((StatusCode::INTERNAL_SERVER_ERROR, Json(json_error)));
-    }
+    // let email_instance = Email::new(user, verification_url, data.config.clone());
+    // if let Err(_) = email_instance.send_verification_code().await {
+    //     let json_error = ErrorResponse {
+    //         status: "fail",
+    //         message: "Something bad happended while sending the verification code".to_string(),
+    //     };
+    //     return Err((StatusCode::INTERNAL_SERVER_ERROR, Json(json_error)));
+    // }
 
-    sqlx::query("UPDATE users SET verification_code = $1 WHERE id = $2")
-        .bind(verification_code)
-        .bind(id)
-        .execute(&data.db)
-        .await
-        .map_err(|e| {
-            let json_error = ErrorResponse {
-                status: "fail",
-                message: format!("Error updating user: {}", e),
-            };
-            (StatusCode::INTERNAL_SERVER_ERROR, Json(json_error))
-        })?;
+    // sqlx::query("UPDATE users SET verification_code = $1 WHERE id = $2")
+    //     .bind(verification_code)
+    //     .bind(id)
+    //     .execute(&data.db)
+    //     .await
+    //     .map_err(|e| {
+    //         let json_error = ErrorResponse {
+    //             status: "fail",
+    //             message: format!("Error updating user: {}", e),
+    //         };
+    //         (StatusCode::INTERNAL_SERVER_ERROR, Json(json_error))
+    //     })?;
 
     let user_response = serde_json::json!({"status": "success","message": format!("We sent an email with a verification code to {}", email)});
 
@@ -304,7 +306,7 @@ pub async fn forgot_password_handler(
 
     let password_reset_url = format!(
         "{}/resetpassword/{}",
-        data.config.frontend_origin.to_owned(),
+        data.config.backend_origin.to_owned(),
         password_reset_token
     );
 
