@@ -105,27 +105,27 @@ pub async fn register_user_handler(
     })?;
 
     //  Create an Email instance
-    // let email_instance = Email::new(user, verification_url, data.config.clone());
-    // if let Err(_) = email_instance.send_verification_code().await {
-    //     let json_error = ErrorResponse {
-    //         status: "fail",
-    //         message: "Something bad happended while sending the verification code".to_string(),
-    //     };
-    //     return Err((StatusCode::INTERNAL_SERVER_ERROR, Json(json_error)));
-    // }
+    let email_instance = Email::new(user, verification_url, data.config.clone());
+    if let Err(_) = email_instance.send_verification_code().await {
+        let json_error = ErrorResponse {
+            status: "fail",
+            message: "Something bad happended while sending the verification code".to_string(),
+        };
+        return Err((StatusCode::INTERNAL_SERVER_ERROR, Json(json_error)));
+    }
 
-    // sqlx::query("UPDATE users SET verification_code = $1 WHERE id = $2")
-    //     .bind(verification_code)
-    //     .bind(id)
-    //     .execute(&data.db)
-    //     .await
-    //     .map_err(|e| {
-    //         let json_error = ErrorResponse {
-    //             status: "fail",
-    //             message: format!("Error updating user: {}", e),
-    //         };
-    //         (StatusCode::INTERNAL_SERVER_ERROR, Json(json_error))
-    //     })?;
+    sqlx::query("UPDATE users SET verification_code = $1 WHERE id = $2")
+        .bind(verification_code)
+        .bind(id)
+        .execute(&data.db)
+        .await
+        .map_err(|e| {
+            let json_error = ErrorResponse {
+                status: "fail",
+                message: format!("Error updating user: {}", e),
+            };
+            (StatusCode::INTERNAL_SERVER_ERROR, Json(json_error))
+        })?;
 
     let user_response = serde_json::json!({"status": "success","message": format!("We sent an email with a verification code to {}", email)});
 
