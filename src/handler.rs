@@ -73,24 +73,25 @@ pub async fn register_user_handler(
         })
         .map(|hash| hash.to_string())?;
 
-    let verification_code = generate_random_string(20);
+    // let verification_code = generate_random_string(20);
     let email = body.email.to_owned().to_ascii_lowercase();
     let id = uuid::Uuid::new_v4().to_string();
-    let verification_url = format!(
-        "{}/api/auth/verifyemail/{}",
-        data.config.backend_origin.to_owned(),
-        verification_code
-    );
+    // let verification_url = format!(
+    //     "{}/api/auth/verifyemail/{}",
+    //     data.config.backend_origin.to_owned(),
+    //     verification_code
+    // );
 
-    println!("verification_url {verification_url}");
+    // println!("verification_url {verification_url}");
 
     let user: User = sqlx::query_as(
-        "INSERT INTO users (id,name,email,password) VALUES ($1, $2, $3, $4) RETURNING *",
+        "INSERT INTO users (id,name,email,password, verified) VALUES ($1, $2, $3, $4, $5) RETURNING *",
     )
     .bind(id.clone())
     .bind(body.name.to_owned())
     .bind(email.clone())
     .bind(hashed_password)
+    .bind(true)
     .fetch_one(&data.db)
     .await
     .map_err(|e| {
@@ -104,30 +105,33 @@ pub async fn register_user_handler(
         )
     })?;
 
+    // println!("verification_url {verification_url} {id}");
+
     //  Create an Email instance
-    let email_instance = Email::new(user, verification_url, data.config.clone());
-    if let Err(_) = email_instance.send_verification_code().await {
-        let json_error = ErrorResponse {
-            status: "fail",
-            message: "Something bad happended while sending the verification code".to_string(),
-        };
-        return Err((StatusCode::INTERNAL_SERVER_ERROR, Json(json_error)));
-    }
+    // let email_instance = Email::new(user, verification_url, data.config.clone());
+    // if let Err(_) = email_instance.send_verification_code().await {
+    //     let json_error = ErrorResponse {
+    //         status: "fail",
+    //         message: "Something bad happended while sending the verification code".to_string(),
+    //     };
+    //     return Err((StatusCode::INTERNAL_SERVER_ERROR, Json(json_error)));
+    // }
 
-    sqlx::query("UPDATE users SET verification_code = $1 WHERE id = $2")
-        .bind(verification_code)
-        .bind(id)
-        .execute(&data.db)
-        .await
-        .map_err(|e| {
-            let json_error = ErrorResponse {
-                status: "fail",
-                message: format!("Error updating user: {}", e),
-            };
-            (StatusCode::INTERNAL_SERVER_ERROR, Json(json_error))
-        })?;
+    // sqlx::query("UPDATE users SET verification_code = $1 WHERE id = $2")
+    //     .bind(verification_code)
+    //     .bind(id)
+    //     .execute(&data.db)
+    //     .await
+    //     .map_err(|e| {
+    //         let json_error = ErrorResponse {
+    //             status: "fail",
+    //             message: format!("Error updating user: {}", e),
+    //         };
+    //         (StatusCode::INTERNAL_SERVER_ERROR, Json(json_error))
+    //     })?;
 
-    let user_response = serde_json::json!({"status": "success","message": format!("We sent an email with a verification code to {}", email)});
+    // let user_response = serde_json::json!({"status": "success","message": format!("We sent an email with a verification code to {}", email)});
+    let user_response = serde_json::json!({"status": "success","message": format!("New user has been created {}", email)});
 
     Ok(Json(user_response))
 }
