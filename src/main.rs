@@ -55,9 +55,8 @@ async fn main() {
         config: config.clone(),
     }));
     // .layer(cors);
-
-    println!("🚀 Server started successfully");
-    axum::Server::bind(&"0.0.0.0:5000".parse().unwrap())
+    let url = format!("{}{}", "0.0.0.0:", config.port);
+    axum::Server::bind(&url.parse().unwrap())
         .serve(app.into_make_service())
         .await
         .unwrap();

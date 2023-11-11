@@ -10,6 +10,7 @@ pub struct Config {
     pub smtp_pass: String,
     pub smtp_from: String,
     pub backend_origin: String,
+    pub port: String,
 }
 
 impl Config {
@@ -24,7 +25,7 @@ impl Config {
         let smtp_user = std::env::var("SMTP_USER").expect("SMTP_USER must be set");
         let smtp_pass = std::env::var("SMTP_PASS").expect("SMTP_PASS must be set");
         let smtp_from = std::env::var("SMTP_FROM").expect("SMTP_FROM must be set");
-
+        let port = std::env::var("PORT").expect("BACKEND_ORIGIN must be set");
         let backend_origin =
             std::env::var("BACKEND_ORIGIN").expect("BACKEND_ORIGIN must be set");
 
@@ -39,6 +40,7 @@ impl Config {
             smtp_port: smtp_port.parse::<u16>().unwrap(),
             smtp_from,
             backend_origin,
+            port
         }
     }
 }
