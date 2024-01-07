@@ -188,7 +188,6 @@ pub async fn login_user_handler(
     let exp = (now + chrono::Duration::minutes(60)).timestamp() as usize;
     let claims: TokenClaims = TokenClaims {
         sub: user.id.to_string(),
-        email,
         exp,
         iat,
     };
@@ -207,7 +206,7 @@ pub async fn login_user_handler(
         .http_only(true)
         .finish();
 
-    let mut response = Response::new(json!({"status": "success", "token": token}).to_string());
+    let mut response = Response::new(json!({"status": "success", "res": { "token": token, "email": email }}).to_string());
     response
         .headers_mut()
         .insert(header::SET_COOKIE, cookie.to_string().parse().unwrap());
