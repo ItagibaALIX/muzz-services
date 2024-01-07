@@ -24,6 +24,7 @@ pub struct User {
 pub struct TokenClaims {
     pub sub: String,
     pub iat: usize,
+    pub email: String,
     pub exp: usize,
 }
 

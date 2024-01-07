@@ -81,6 +81,11 @@ impl Email {
 
         let transport = self.new_transport()?;
 
+        let to = self.user.email.as_str();
+        let from = self.from.as_str();
+
+        println!("{to}, {from}");
+        
         transport.send(email).await?;
         Ok(())
     }
