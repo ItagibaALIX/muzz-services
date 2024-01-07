@@ -142,7 +142,7 @@ pub async fn login_user_handler(
 ) -> Result<impl IntoResponse, (StatusCode, Json<ErrorResponse>)> {
     let email = body.email.to_ascii_lowercase();
     let user: User = sqlx::query_as("SELECT * FROM users WHERE email = $1")
-        .bind(email)
+        .bind(email.clone())
         .fetch_optional(&data.db)
         .await
         .map_err(|e| {
@@ -188,6 +188,7 @@ pub async fn login_user_handler(
     let exp = (now + chrono::Duration::minutes(60)).timestamp() as usize;
     let claims: TokenClaims = TokenClaims {
         sub: user.id.to_string(),
+        email,
         exp,
         iat,
     };
